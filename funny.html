@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funny — Alex 35</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="dj.html">DJ Booth</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="funny.html">Funny</a></li>
+      <li><a href="wishes.html">Wishes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>Funny Moments</h1>
+      <p>35 years of unintentional comedy</p>
+      <div class="glow-divider"></div>
+    </div>
+
+    <div class="slideshow-container" id="slideshow2">
+      <div class="slideshow-track">
+        <div class="slideshow-slide">
+          <div class="slide-placeholder">😂</div>
+          <div class="slide-title">The Dancing Incident</div>
+          <div class="slide-caption">We don't talk about it. But we have photos.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#2d1b3d,#1a1a2e);">🤦</div>
+          <div class="slide-title">That One Outfit</div>
+          <div class="slide-caption">The 2010s were rough on everyone.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#16213e,#0f3460);">😅</div>
+          <div class="slide-title">Cooking Adventures</div>
+          <div class="slide-caption">The smoke detector is his biggest fan.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#3d1b1b,#1a1a2e);">🤣</div>
+          <div class="slide-title">Karaoke Night</div>
+          <div class="slide-caption">The neighbors still bring it up.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#1b3d2d,#16213e);">😎</div>
+          <div class="slide-title">Thinking He's Smooth</div>
+          <div class="slide-caption">Spoiler: he's not. But we love him anyway.</div>
+        </div>
+      </div>
+
+      <div class="slideshow-controls">
+        <button class="slideshow-btn slideshow-prev">‹</button>
+        <div class="slideshow-dots">
+          <button class="dot active"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+        </div>
+        <button class="slideshow-btn slideshow-next">›</button>
+        <button class="slideshow-btn slideshow-play" title="Pause">❚❚</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/slideshow.js"></script>
+  <script>new AutoSlideshow('slideshow2', { interval: 3500 });</script>
+</body>
+</html>

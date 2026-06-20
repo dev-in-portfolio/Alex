@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memories — Alex 35</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="dj.html">DJ Booth</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="funny.html">Funny</a></li>
+      <li><a href="wishes.html">Wishes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>Memories</h1>
+      <p>A walk through 35 years of greatness</p>
+      <div class="glow-divider"></div>
+    </div>
+
+    <div class="slideshow-container" id="slideshow1">
+      <div class="slideshow-track">
+        <div class="slideshow-slide">
+          <div class="slide-placeholder">1</div>
+          <div class="slide-title">Where It All Began</div>
+          <div class="slide-caption">The early days — tiny Alex, big dreams</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#2d1b3d,#1a1a2e);">2</div>
+          <div class="slide-title">School Days</div>
+          <div class="slide-caption">Making friends and causing chaos</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#16213e,#0f3460);">3</div>
+          <div class="slide-title">Growing Up</div>
+          <div class="slide-caption">From boy to legend in progress</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#3d1b1b,#1a1a2e);">4</div>
+          <div class="slide-title">The Risky Years</div>
+          <div class="slide-caption">Bold moves and questionable haircuts</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#1b3d2d,#16213e);">5</div>
+          <div class="slide-title">35 & Thriving</div>
+          <div class="slide-caption">The masterpiece is still being painted</div>
+        </div>
+      </div>
+
+      <div class="slideshow-controls">
+        <button class="slideshow-btn slideshow-prev">‹</button>
+        <div class="slideshow-dots">
+          <button class="dot active"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+        </div>
+        <button class="slideshow-btn slideshow-next">›</button>
+        <button class="slideshow-btn slideshow-play" title="Pause">❚❚</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/slideshow.js"></script>
+  <script>new AutoSlideshow('slideshow1', { interval: 4000 });</script>
+</body>
+</html>

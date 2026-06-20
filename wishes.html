@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishes — Alex 35</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="dj.html">DJ Booth</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="funny.html">Funny</a></li>
+      <li><a href="wishes.html">Wishes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>Birthday Wishes</h1>
+      <p>A few words for the birthday legend</p>
+      <div class="glow-divider"></div>
+    </div>
+
+    <div class="slideshow-container" id="slideshow3">
+      <div class="slideshow-track">
+        <div class="slideshow-slide">
+          <div class="slide-placeholder">🎂</div>
+          <div class="slide-title">Happy 35th, Alex!</div>
+          <div class="slide-caption">May your cake be as sweet as your questionable life choices.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#2d1b3d,#1a1a2e);">🥂</div>
+          <div class="slide-title">Cheers to You</div>
+          <div class="slide-caption">Here's to another year of pretending to adult.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#16213e,#0f3460);">🎉</div>
+          <div class="slide-title">Keep Being You</div>
+          <div class="slide-caption">The world needs more people who don't take themselves seriously.</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#3d1b1b,#1a1a2e);">✨</div>
+          <div class="slide-title">You Made It</div>
+          <div class="slide-caption">35 looks good on you. (Unlike that shirt from 2012.)</div>
+        </div>
+        <div class="slideshow-slide">
+          <div class="slide-placeholder" style="background:linear-gradient(135deg,#1b3d2d,#16213e);">💫</div>
+          <div class="slide-title">The Best Is Yet to Come</div>
+          <div class="slide-caption">Happy birthday, Alex. We're lucky to know you.</div>
+        </div>
+      </div>
+
+      <div class="slideshow-controls">
+        <button class="slideshow-btn slideshow-prev">‹</button>
+        <div class="slideshow-dots">
+          <button class="dot active"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+          <button class="dot"></button>
+        </div>
+        <button class="slideshow-btn slideshow-next">›</button>
+        <button class="slideshow-btn slideshow-play" title="Pause">❚❚</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/slideshow.js"></script>
+  <script>new AutoSlideshow('slideshow3', { interval: 4000 });</script>
+</body>
+</html>

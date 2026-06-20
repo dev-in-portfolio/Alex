@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery — Alex 35</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="dj.html">DJ Booth</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="funny.html">Funny</a></li>
+      <li><a href="wishes.html">Wishes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>Gallery</h1>
+      <p>A collection of Alex's finest moments</p>
+      <div class="glow-divider"></div>
+    </div>
+
+    <section class="section" style="padding-top: 2rem;">
+      <div class="gallery-grid">
+        <div class="gallery-item fade-in delay-1" data-label="The Early Years" data-desc="How it all began" onclick="openLightbox(0)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>The Early Years</span><small>How it all began</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-2" data-label="Questionable Fashion" data-desc="We all had a phase" onclick="openLightbox(1)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>Questionable Fashion</span><small>We all had a phase</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-3" data-label="Adventure Mode" data-desc="Outdoorsy Alex" onclick="openLightbox(2)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>Adventure Mode</span><small>Outdoorsy Alex</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-1" data-label="Party Era" data-desc="The wild nights" onclick="openLightbox(3)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>Party Era</span><small>The wild nights</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-2" data-label="Candid Classics" data-desc="No filter needed" onclick="openLightbox(4)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>Candid Classics</span><small>No filter needed</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-3" data-label="35th Birthday" data-desc="The main event" onclick="openLightbox(5)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>35th Birthday</span><small>The main event</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-1" data-label="With Friends" data-desc="The squad" onclick="openLightbox(6)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>With Friends</span><small>The squad</small></div>
+        </div>
+        <div class="gallery-item fade-in delay-2" data-label="Being Himself" data-desc="Peak Alex" onclick="openLightbox(7)">
+          <div class="placeholder-img">✦</div>
+          <div class="overlay"><span>Being Himself</span><small>Peak Alex</small></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Add your own photos — replace the <span class="gold-text">✦</span> placeholders in /img/</p>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('active'); document.body.style.overflow=''">✕</button>
+    <button class="lightbox-nav lightbox-prev" onclick="prevImage()">‹</button>
+    <div class="lightbox-content" id="lightboxContent"></div>
+    <button class="lightbox-nav lightbox-next" onclick="nextImage()">›</button>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/gallery.js"></script>
+</body>
+</html>

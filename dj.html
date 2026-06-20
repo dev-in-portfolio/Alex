@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DJ Booth — Alex 35</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="dj.html">DJ Booth</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="funny.html">Funny</a></li>
+      <li><a href="wishes.html">Wishes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>DJ Booth</h1>
+      <p>Spin the tracks — Happy Birthday Alex!</p>
+      <div class="glow-divider"></div>
+    </div>
+
+    <section class="section" style="padding-top: 2rem;">
+      <div class="dj-booth">
+        <div class="dj-vinyl fade-in">
+          <div class="vinyl-disc">
+            <div class="now-playing">Now Playing</div>
+          </div>
+          <div class="now-playing" style="margin-top:1rem;">Now Playing</div>
+          <div class="song-title" id="nowPlayingName">Select a track</div>
+
+          <div class="dj-controls">
+            <button class="dj-btn" id="prevBtn" title="Previous">⏮</button>
+            <button class="dj-btn play-btn" id="playBtn" title="Play/Pause">▶</button>
+            <button class="dj-btn" id="nextBtn" title="Next">⏭</button>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="time-display">
+            <span id="currentTime">0:00</span>
+            <span id="totalTime">0:00</span>
+          </div>
+
+          <div class="volume-control">
+            <span style="font-size:0.8rem;color:var(--text-muted)">🔈</span>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+            <span style="font-size:0.9rem;color:var(--text-muted)">🔊</span>
+          </div>
+        </div>
+
+        <div class="songs-list fade-in delay-1">
+          <h3>Tracklist</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;">
+            Click a song to play. Download buttons on the right.
+          </p>
+          <div id="songList"></div>
+          <p style="color:var(--text-muted);font-size:0.75rem;margin-top:1.5rem;text-align:center;">
+            Demo tracks provided by SoundHelix — replace with your own songs in /songs/
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Drop the bass <span class="gold-text">✦</span> Turn it up for 35</p>
+    </footer>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/dj.js"></script>
+</body>
+</html>
