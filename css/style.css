@@ -272,7 +272,6 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   line-height: 0.95;
   letter-spacing: -0.04em;
   margin-bottom: 1.5rem;
-  opacity: 0;
 }
 
 .hero h1 .line {
@@ -834,6 +833,16 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
 }
 
 @keyframes strobe { 50% { opacity: 0; } }
+
+#circularViz {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 50%;
+}
 
 .song-info {
   margin-bottom: 1.5rem;

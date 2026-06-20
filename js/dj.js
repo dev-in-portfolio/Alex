@@ -24,70 +24,6 @@ let analyser = null;
 let source = null;
 let animFrame = null;
 
-const visualizer = document.getElementById('visualizer');
-const vCtx = visualizer?.getContext('2d');
-if (vCtx) {
-  visualizer.width = visualizer.clientWidth || 600;
-  visualizer.height = visualizer.clientHeight || 80;
-}
-
-function initAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }
-}
-
-function drawVisualizer() {
-  if (!vCtx || !analyser) return;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  analyser.getByteFrequencyData(dataArray);
-
-  vCtx.clearRect(0, 0, visualizer.width, visualizer.height);
-
-  const barCount = 48;
-  const step = Math.floor(bufferLength / barCount);
-  const barW = visualizer.width / barCount - 2;
-
-  for (let i = 0; i < barCount; i++) {
-    let sum = 0;
-    for (let j = 0; j < step; j++) sum += dataArray[i * step + j];
-    const avg = sum / step;
-    const h = (avg / 255) * visualizer.height * 0.9;
-
-    const t = i / barCount;
-    const r = Math.round(212 - t * 40);
-    const g = Math.round(175 - t * 30);
-    const b = Math.round(55 + t * 20);
-
-    vCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.5 + h / visualizer.height * 0.5})`;
-    vCtx.fillRect(i * (barW + 2), visualizer.height - h, barW, h);
-
-    // glow
-    vCtx.shadowBlur = 6;
-    vCtx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.3)`;
-    vCtx.fillRect(i * (barW + 2), visualizer.height - h, barW, h);
-    vCtx.shadowBlur = 0;
-  }
-
-  animFrame = requestAnimationFrame(drawVisualizer);
-}
-
-function stopVisualizer() {
-  if (animFrame) {
-    cancelAnimationFrame(animFrame);
-    animFrame = null;
-  }
-  if (vCtx) {
-    vCtx.clearRect(0, 0, visualizer.width, visualizer.height);
-  }
-}
-
 // DOM refs
 const playBtn = document.getElementById('playBtn');
 const prevBtn = document.getElementById('prevBtn');
@@ -101,26 +37,119 @@ const vinylDisc = document.querySelector('.vinyl-disc');
 const strobe = document.querySelector('.vinyl-strobe');
 const songListEl = document.getElementById('songList');
 
-function renderSongs() {
-  if (!songListEl) return;
-  songListEl.innerHTML = songs.map((s, i) => `
-    <div class="song-item${i === currentSong ? ' active' : ''}" data-index="${i}">
-      <div class="song-icon">♪</div>
-      <div class="song-info">
-        <div class="song-name">${s.name}</div>
-        <div class="song-artist">${s.artist}</div>
-      </div>
-      <a class="song-dl" href="${demoUrls[i]}" download target="_blank" title="Download">↓</a>
-    </div>
-  `).join('');
+// === CIRCULAR VISUALIZER ===
+const vizCanvas = document.getElementById('circularViz');
+const vCtx = vizCanvas?.getContext('2d');
 
-  songListEl.querySelectorAll('.song-item').forEach(el => {
-    el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.index);
-      if (idx === currentSong) { togglePlay(); return; }
-      playSong(idx);
-    });
-  });
+function setupVizCanvas() {
+  if (!vizCanvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const size = 260;
+  vizCanvas.width = size * dpr;
+  vizCanvas.height = size * dpr;
+  vizCanvas.style.width = size + 'px';
+  vizCanvas.style.height = size + 'px';
+  vCtx.scale(dpr, dpr);
+}
+
+setupVizCanvas();
+window.addEventListener('resize', setupVizCanvas);
+
+function initAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+}
+
+function drawCircularViz() {
+  if (!vCtx || !analyser || !vizCanvas) {
+    animFrame = requestAnimationFrame(drawCircularViz);
+    return;
+  }
+
+  const dpr = window.devicePixelRatio || 1;
+  const size = 260;
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = 115;
+  const innerR = 70;
+  const midR = (outerR + innerR) / 2;
+
+  vCtx.clearRect(0, 0, size, size);
+
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  analyser.getByteFrequencyData(dataArray);
+
+  const bars = 60;
+  const step = Math.floor(bufferLength / bars);
+  const angleStep = (Math.PI * 2) / bars;
+
+  // Glow ring
+  const grad = vCtx.createRadialGradient(cx, cy, innerR - 5, cx, cy, outerR + 10);
+  grad.addColorStop(0, 'rgba(212, 175, 55, 0.02)');
+  grad.addColorStop(0.5, 'rgba(212, 175, 55, 0.05)');
+  grad.addColorStop(1, 'rgba(212, 175, 55, 0)');
+  vCtx.beginPath();
+  vCtx.arc(cx, cy, outerR + 10, 0, Math.PI * 2);
+  vCtx.fillStyle = grad;
+  vCtx.fill();
+
+  // Draw bars
+  for (let i = 0; i < bars; i++) {
+    let sum = 0;
+    for (let j = 0; j < step; j++) sum += dataArray[i * step + j];
+    const avg = sum / step;
+    const pct = avg / 255;
+    const barH = 5 + pct * 45;
+
+    const angle = i * angleStep - Math.PI / 2;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    const x1 = cx + cos * innerR;
+    const y1 = cy + sin * innerR;
+    const x2 = cx + cos * (innerR + barH);
+    const y2 = cy + sin * (innerR + barH);
+
+    const t = i / bars;
+    const r = Math.round(212 - t * 50);
+    const g = Math.round(175 - t * 40);
+    const b = Math.round(55 + t * 30);
+
+    vCtx.beginPath();
+    vCtx.moveTo(x1, y1);
+    vCtx.lineTo(x2, y2);
+    vCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.3 + pct * 0.7})`;
+    vCtx.lineWidth = 3.5;
+    vCtx.lineCap = 'round';
+    vCtx.shadowBlur = 8;
+    vCtx.shadowColor = `rgba(${r}, ${g}, ${b}, ${pct * 0.5})`;
+    vCtx.stroke();
+    vCtx.shadowBlur = 0;
+  }
+
+  // Inner glow
+  const ig = vCtx.createRadialGradient(cx, cy, 0, cx, cy, innerR);
+  ig.addColorStop(0, 'rgba(212, 175, 55, 0.06)');
+  ig.addColorStop(0.7, 'rgba(212, 175, 55, 0.03)');
+  ig.addColorStop(1, 'rgba(212, 175, 55, 0)');
+  vCtx.beginPath();
+  vCtx.arc(cx, cy, innerR, 0, Math.PI * 2);
+  vCtx.fillStyle = ig;
+  vCtx.fill();
+
+  animFrame = requestAnimationFrame(drawCircularViz);
+}
+
+function stopViz() {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  if (vCtx) vCtx.clearRect(0, 0, vizCanvas.width, vizCanvas.height);
 }
 
 function playSong(index) {
@@ -131,26 +160,18 @@ function playSong(index) {
   audio.play().then(() => {
     isPlaying = true;
     initAudioContext();
-    drawVisualizer();
     updateUI();
-  }).catch(() => {
-    isPlaying = false;
-    updateUI();
-  });
+  }).catch(() => { isPlaying = false; updateUI(); });
   updateUI();
 }
 
 function togglePlay() {
   if (currentSong < 0) { playSong(0); return; }
-  if (isPlaying) {
-    audio.pause();
-    isPlaying = false;
-    stopVisualizer();
-  } else {
+  if (isPlaying) { audio.pause(); isPlaying = false; stopViz(); }
+  else {
     audio.play().then(() => {
       isPlaying = true;
-      initAudioContext();
-      drawVisualizer();
+      if (!audioCtx) initAudioContext();
       updateUI();
     }).catch(() => {});
   }
@@ -174,6 +195,11 @@ function updateUI() {
   playBtn.textContent = isPlaying ? '❚❚' : '▶';
   vinylDisc?.classList.toggle('playing', isPlaying);
   strobe?.classList.toggle('active', isPlaying);
+
+  // Start/stop circular visualizer with play state
+  if (isPlaying && audioCtx) {
+    drawCircularViz();
+  }
 
   if (songNameDisplay && currentSong >= 0) {
     songNameDisplay.textContent = songs[currentSong].name;
@@ -215,12 +241,26 @@ document.querySelector('.progress-bar')?.addEventListener('click', (e) => {
   audio.currentTime = pct * audio.duration;
 });
 
-// Resize visualizer
-window.addEventListener('resize', () => {
-  if (visualizer) {
-    visualizer.width = visualizer.clientWidth;
-    visualizer.height = visualizer.clientHeight;
-  }
-});
+function renderSongs() {
+  if (!songListEl) return;
+  songListEl.innerHTML = songs.map((s, i) => `
+    <div class="song-item${i === currentSong ? ' active' : ''}" data-index="${i}">
+      <div class="song-icon">♪</div>
+      <div class="song-info">
+        <div class="song-name">${s.name}</div>
+        <div class="song-artist">${s.artist}</div>
+      </div>
+      <a class="song-dl" href="${demoUrls[i]}" download target="_blank">↓</a>
+    </div>
+  `).join('');
+
+  songListEl.querySelectorAll('.song-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.index);
+      if (idx === currentSong) { togglePlay(); return; }
+      playSong(idx);
+    });
+  });
+}
 
 renderSongs();
