@@ -7,10 +7,18 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="ambient-bg"></div>
+
+  <div class="preloader" id="preloader">
+    <div class="preloader-ring"></div>
+  </div>
+
+  <canvas id="canvas-bg"></canvas>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
 
   <nav class="navbar">
-    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <a href="index.html" class="nav-logo">A<span></span>LEX</a>
     <button class="nav-toggle" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -27,54 +35,53 @@
   <main>
     <div class="page-header">
       <h1>Gallery</h1>
-      <p>A collection of Alex's finest moments</p>
-      <div class="glow-divider"></div>
+      <p>Alex's greatest hits</p>
     </div>
 
     <section class="section" style="padding-top: 2rem;">
       <div class="gallery-grid">
-        <div class="gallery-item fade-in delay-1" data-label="The Early Years" data-desc="How it all began" onclick="openLightbox(0)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>The Early Years</span><small>How it all began</small></div>
+        <div class="gallery-item" data-label="The Early Years" data-desc="Where it all began" onclick="openLightbox(0)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">The Early Years</span><span class="desc">Where it all began</span></div>
         </div>
-        <div class="gallery-item fade-in delay-2" data-label="Questionable Fashion" data-desc="We all had a phase" onclick="openLightbox(1)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>Questionable Fashion</span><small>We all had a phase</small></div>
+        <div class="gallery-item" data-label="Questionable Fashion" data-desc="We all had a phase" onclick="openLightbox(1)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">Questionable Fashion</span><span class="desc">We all had a phase</span></div>
         </div>
-        <div class="gallery-item fade-in delay-3" data-label="Adventure Mode" data-desc="Outdoorsy Alex" onclick="openLightbox(2)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>Adventure Mode</span><small>Outdoorsy Alex</small></div>
+        <div class="gallery-item" data-label="Adventure Mode" data-desc="Outdoorsy Alex" onclick="openLightbox(2)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">Adventure Mode</span><span class="desc">Outdoorsy Alex</span></div>
         </div>
-        <div class="gallery-item fade-in delay-1" data-label="Party Era" data-desc="The wild nights" onclick="openLightbox(3)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>Party Era</span><small>The wild nights</small></div>
+        <div class="gallery-item" data-label="Party Era" data-desc="The wild nights" onclick="openLightbox(3)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">Party Era</span><span class="desc">The wild nights</span></div>
         </div>
-        <div class="gallery-item fade-in delay-2" data-label="Candid Classics" data-desc="No filter needed" onclick="openLightbox(4)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>Candid Classics</span><small>No filter needed</small></div>
+        <div class="gallery-item" data-label="Candid Classics" data-desc="No filter needed" onclick="openLightbox(4)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">Candid Classics</span><span class="desc">No filter needed</span></div>
         </div>
-        <div class="gallery-item fade-in delay-3" data-label="35th Birthday" data-desc="The main event" onclick="openLightbox(5)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>35th Birthday</span><small>The main event</small></div>
+        <div class="gallery-item" data-label="35th Birthday" data-desc="The main event" onclick="openLightbox(5)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">35th Birthday</span><span class="desc">The main event</span></div>
         </div>
-        <div class="gallery-item fade-in delay-1" data-label="With Friends" data-desc="The squad" onclick="openLightbox(6)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>With Friends</span><small>The squad</small></div>
+        <div class="gallery-item" data-label="With Friends" data-desc="The squad" onclick="openLightbox(6)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">With Friends</span><span class="desc">The squad</span></div>
         </div>
-        <div class="gallery-item fade-in delay-2" data-label="Being Himself" data-desc="Peak Alex" onclick="openLightbox(7)">
-          <div class="placeholder-img">✦</div>
-          <div class="overlay"><span>Being Himself</span><small>Peak Alex</small></div>
+        <div class="gallery-item" data-label="Being Himself" data-desc="Peak Alex" onclick="openLightbox(7)">
+          <div class="img-placeholder">✦</div>
+          <div class="overlay"><span class="label">Being Himself</span><span class="desc">Peak Alex</span></div>
         </div>
       </div>
     </section>
 
     <footer class="footer">
-      <p>Add your own photos — replace the <span class="gold-text">✦</span> placeholders in /img/</p>
+      Drop your photos in <span class="gold">/img/</span> and update the placeholders
     </footer>
   </main>
 
   <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('active'); document.body.style.overflow=''">✕</button>
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     <button class="lightbox-nav lightbox-prev" onclick="prevImage()">‹</button>
     <div class="lightbox-content" id="lightboxContent"></div>
     <button class="lightbox-nav lightbox-next" onclick="nextImage()">›</button>

@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="ambient-bg"></div>
+
+  <canvas id="canvas-bg"></canvas>
 
   <nav class="navbar">
-    <a href="index.html" class="nav-logo">Alex ✦ 35</a>
+    <a href="index.html" class="nav-logo">A<span></span>LEX</a>
     <button class="nav-toggle" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -27,56 +28,46 @@
   <main>
     <div class="page-header">
       <h1>Memories</h1>
-      <p>A walk through 35 years of greatness</p>
-      <div class="glow-divider"></div>
+      <p>35 years in frames</p>
     </div>
 
     <div class="slideshow-container" id="slideshow1">
       <div class="slideshow-track">
-        <div class="slideshow-slide">
-          <div class="slide-placeholder">1</div>
-          <div class="slide-title">Where It All Began</div>
-          <div class="slide-caption">The early days — tiny Alex, big dreams</div>
+        <div class="slideshow-slide active">
+          <div class="slide-visual"><div class="zoom-content">1</div></div>
+          <div class="slide-text"><div class="slide-title">Where It All Began</div><div class="slide-caption">Tiny Alex. Big dreams. Same terrible haircut.</div></div>
         </div>
         <div class="slideshow-slide">
-          <div class="slide-placeholder" style="background:linear-gradient(135deg,#2d1b3d,#1a1a2e);">2</div>
-          <div class="slide-title">School Days</div>
-          <div class="slide-caption">Making friends and causing chaos</div>
+          <div class="slide-visual" style="background:linear-gradient(135deg,#1a0a1a,#3a1a2a)"><div class="zoom-content">2</div></div>
+          <div class="slide-text"><div class="slide-title">School of Hard Knocks</div><div class="slide-caption">Making friends and causing chaos since day one.</div></div>
         </div>
         <div class="slideshow-slide">
-          <div class="slide-placeholder" style="background:linear-gradient(135deg,#16213e,#0f3460);">3</div>
-          <div class="slide-title">Growing Up</div>
-          <div class="slide-caption">From boy to legend in progress</div>
+          <div class="slide-visual" style="background:linear-gradient(135deg,#0a1a1a,#1a3a3a)"><div class="zoom-content">3</div></div>
+          <div class="slide-text"><div class="slide-title">Growing Up</div><div class="slide-caption">From boy to legend-in-progress.</div></div>
         </div>
         <div class="slideshow-slide">
-          <div class="slide-placeholder" style="background:linear-gradient(135deg,#3d1b1b,#1a1a2e);">4</div>
-          <div class="slide-title">The Risky Years</div>
-          <div class="slide-caption">Bold moves and questionable haircuts</div>
+          <div class="slide-visual" style="background:linear-gradient(135deg,#1a1a0a,#3a3a1a)"><div class="zoom-content">4</div></div>
+          <div class="slide-text"><div class="slide-title">The Risky Years</div><div class="slide-caption">Bold moves, bad ideas, great stories.</div></div>
         </div>
         <div class="slideshow-slide">
-          <div class="slide-placeholder" style="background:linear-gradient(135deg,#1b3d2d,#16213e);">5</div>
-          <div class="slide-title">35 & Thriving</div>
-          <div class="slide-caption">The masterpiece is still being painted</div>
+          <div class="slide-visual" style="background:linear-gradient(135deg,#1a0a0a,#3a1a1a)"><div class="zoom-content">5</div></div>
+          <div class="slide-text"><div class="slide-title">35 & Thriving</div><div class="slide-caption">The masterpiece is still being painted.</div></div>
         </div>
       </div>
 
-      <div class="slideshow-controls">
-        <button class="slideshow-btn slideshow-prev">‹</button>
+      <div class="slideshow-ui">
+        <button class="ss-btn slideshow-prev">‹</button>
         <div class="slideshow-dots">
-          <button class="dot active"></button>
-          <button class="dot"></button>
-          <button class="dot"></button>
-          <button class="dot"></button>
-          <button class="dot"></button>
+          <button class="dot active"></button><button class="dot"></button><button class="dot"></button><button class="dot"></button><button class="dot"></button>
         </div>
-        <button class="slideshow-btn slideshow-next">›</button>
-        <button class="slideshow-btn slideshow-play" title="Pause">❚❚</button>
+        <button class="ss-btn slideshow-next">›</button>
+        <button class="ss-btn slideshow-play" title="Pause">❚❚</button>
       </div>
     </div>
   </main>
 
   <script src="js/main.js"></script>
   <script src="js/slideshow.js"></script>
-  <script>new AutoSlideshow('slideshow1', { interval: 4000 });</script>
+  <script>new KenBurnsSlideshow('slideshow1',{interval:4000});</script>
 </body>
 </html>
