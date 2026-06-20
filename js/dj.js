@@ -55,6 +55,15 @@ function setupVizCanvas() {
 setupVizCanvas();
 window.addEventListener('resize', setupVizCanvas);
 
+// Pipe audio data to global scene for 3D reactivity
+function pushAudioToScene() {
+  if (!analyser) return;
+  const bufferLength = analyser.frequencyBinCount;
+  const data = new Uint8Array(bufferLength);
+  analyser.getByteFrequencyData(data);
+  window.sceneAudio.data = data;
+}
+
 function initAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -89,6 +98,9 @@ function drawCircularViz() {
   const bars = 60;
   const step = Math.floor(bufferLength / bars);
   const angleStep = (Math.PI * 2) / bars;
+
+  // Push audio data to 3D scene
+  pushAudioToScene();
 
   // Glow ring
   const grad = vCtx.createRadialGradient(cx, cy, innerR - 5, cx, cy, outerR + 10);
