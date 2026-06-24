@@ -1726,6 +1726,10 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
     var(--bg);
 }
 
+.party-page .navbar {
+  display: none;
+}
+
 .party-shell {
   position: relative;
   min-height: 100vh;
@@ -1772,20 +1776,8 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   position: relative;
   z-index: 2;
   min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 1rem;
-  padding: 5.25rem 1rem 1rem;
-}
-
-.party-topline {
-  width: min(1240px, calc(100vw - 2rem));
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
+  display: block;
+  padding: 0;
 }
 
 .party-meta {
@@ -1813,14 +1805,14 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
 
 .party-viewer {
   position: relative;
-  width: min(1240px, calc(100vw - 2rem));
-  margin: 0 auto;
-  min-height: min(80vh, 920px);
-  border-radius: 28px;
-  border: 1px solid rgba(212, 175, 55, 0.16);
-  background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 28px 120px rgba(0, 0, 0, 0.55);
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  border-radius: 0;
+  border: none;
+  background: #000;
+  backdrop-filter: none;
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -1829,6 +1821,9 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   inset: 0;
   opacity: 0;
   transition: opacity 0.9s var(--ease-out);
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .party-slide.is-active {
@@ -1854,9 +1849,22 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 1rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.0) 100%);
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.08) 35%, rgba(0,0,0,0.0) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.34) 0%, rgba(0,0,0,0.0) 26%);
+  pointer-events: none;
+}
+
+.party-topline {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  pointer-events: none;
 }
 
 .party-controls {
@@ -1866,6 +1874,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   justify-content: space-between;
   gap: 0.75rem;
   margin-top: 0.5rem;
+  pointer-events: auto;
 }
 
 .party-button {
@@ -1946,20 +1955,18 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
 
 @media (max-width: 768px) {
   .party-frame {
-    padding-top: 4.5rem;
-  }
-
-  .party-topline {
-    align-items: flex-start;
+    padding: 0;
   }
 
   .party-viewer {
-    min-height: 74vh;
-    border-radius: 22px;
+    min-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
   }
 
   .party-controls {
     justify-content: stretch;
+    align-items: flex-end;
   }
 
   .party-button {
