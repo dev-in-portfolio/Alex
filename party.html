@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Party Mode — Alex 35</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body class="party-page">
+  <div class="preloader" id="preloader">
+    <div class="preloader-ring"></div>
+  </div>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">A<span></span>LEX</a>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="dj.html">DJ Booth</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="party.html">Party</a></li>
+      <li><a href="funny.html">Funny</a></li>
+    </ul>
+  </nav>
+
+  <main class="party-shell">
+    <section class="party-stage" aria-label="Party slideshow">
+      <div class="party-fx" id="partyFx"></div>
+      <div class="party-frame">
+        <header class="party-header">
+          <div>
+            <div class="party-kicker">Party Mode</div>
+            <h1>Alex After Dark</h1>
+            <div class="party-meta" id="partySource">Loading the A2 photo vault…</div>
+          </div>
+          <div class="party-badge" id="partyStatus">Preparing the deck…</div>
+        </header>
+
+        <section class="party-viewer" id="partyViewer">
+          <img class="party-slide is-active" id="partySlideA" alt="">
+          <img class="party-slide" id="partySlideB" alt="">
+          <div class="party-overlay">
+            <div class="party-caption">
+              <div class="party-album" id="partyAlbum">Party Mode</div>
+              <h2 id="partyTitle">Loading photos</h2>
+              <p id="partyDescription">The slideshow will begin as soon as the manifest is ready.</p>
+            </div>
+
+            <div class="party-status">
+              <span>Queue <strong id="partyCounter">000 / 000</strong></span>
+              <span>Source <strong>A2 manifest</strong></span>
+            </div>
+
+            <div class="party-controls">
+              <button class="party-button primary" type="button" id="partyNext">Next Photo</button>
+              <button class="party-button" type="button" id="partyPause">Pause</button>
+              <a class="party-button" href="index.html" id="partyBack">Back to Site</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/party.js"></script>
+</body>
+</html>

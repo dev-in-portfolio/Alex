@@ -1,12 +1,13 @@
 const GALLERY_CONFIG = {
-  mediaBaseUrl: 'https://dev-in-portfolio.github.io/A2/',
-  manifestUrl: 'https://dev-in-portfolio.github.io/A2/data/manifest.json',
+  mediaBaseUrl: 'https://happy-alex-2.netlify.app/',
+  manifestUrl: 'https://happy-alex-2.netlify.app/data/manifest.json',
+  historyErasUrl: 'https://happy-alex-2.netlify.app/data/history-eras.json',
   fallbackManifestUrl: 'data/manifest.snapshot.json',
 };
 
 const galleryState = {
-  sourceLabel: 'Loading…',
   manifest: null,
+  historyEras: [],
   albums: [],
   selectedAlbumIndex: -1,
   currentPhotos: [],
@@ -19,6 +20,7 @@ const galleryEls = {
   albumList: document.getElementById('albumList'),
   activeAlbumTitle: document.getElementById('activeAlbumTitle'),
   activeAlbumMeta: document.getElementById('activeAlbumMeta'),
+  activeAlbumEraDescription: document.getElementById('activeAlbumEraDescription'),
   photoGrid: document.getElementById('photoGrid'),
   lightbox: document.getElementById('galleryLightbox'),
   lightboxImage: document.getElementById('lightboxImage'),
@@ -85,6 +87,39 @@ function updateSourceLabel(message) {
   if (galleryEls.source) galleryEls.source.textContent = message;
 }
 
+function fetchJson(url) {
+  return fetch(url, { cache: 'no-store' }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`Failed to load ${url}: ${response.status}`);
+    }
+    return response.json();
+  });
+}
+
+function deriveFallbackEras(manifest) {
+  const albums = Array.isArray(manifest?.albums) ? manifest.albums : [];
+  return albums.map((album, index) => ({
+    number: index + 1,
+    dateRange: album.year || 'unknown-year',
+    title: album.title || `Album ${index + 1}`,
+    description: 'History-era framing is unavailable in the local snapshot, so this album is shown as a birthday timeline chapter.',
+  }));
+}
+
+function buildEraLookup(historyEras) {
+  const lookup = new Map();
+  historyEras.forEach((era, index) => {
+    const key = Number(era?.number) || index + 1;
+    lookup.set(key, {
+      number: key,
+      dateRange: era?.dateRange || era?.yearRange || 'unknown-year',
+      title: era?.title || era?.name || `Era ${key}`,
+      description: era?.description || '',
+    });
+  });
+  return lookup;
+}
+
 function normalizePhoto(photo, albumTitle, useMediaBase) {
   const src = useMediaBase ? mediaUrl(photo.src) : (photo.src || '');
   const thumb = useMediaBase ? mediaUrl(photo.thumb) : (photo.thumb || '');
@@ -96,38 +131,57 @@ function normalizePhoto(photo, albumTitle, useMediaBase) {
   };
 }
 
-function normalizeAlbum(album, useMediaBase) {
+function normalizeAlbum(album, useMediaBase, era) {
+  const photos = Array.isArray(album.photos)
+    ? album.photos.map((photo) => normalizePhoto(photo, album.title, useMediaBase))
+    : [];
+
   return {
     ...album,
     cover: useMediaBase ? mediaUrl(album.cover) : (album.cover || ''),
-    photos: Array.isArray(album.photos) ? album.photos.map((photo) => normalizePhoto(photo, album.title, useMediaBase)) : [],
+    photos,
+    era: era || null,
+    eraNumber: era?.number || null,
   };
 }
 
-async function fetchJson(url) {
-  const response = await fetch(url, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error(`Failed to load ${url}: ${response.status}`);
-  }
-  return response.json();
-}
-
-async function loadManifest() {
-  const sources = [
-    { url: GALLERY_CONFIG.manifestUrl, label: 'A2 live media store' },
-    { url: GALLERY_CONFIG.fallbackManifestUrl, label: 'local fallback snapshot' },
+async function loadManifestBundle() {
+  const manifestSources = [
+    { url: GALLERY_CONFIG.manifestUrl, label: 'A2 live media store', useMediaBase: true },
+    { url: GALLERY_CONFIG.fallbackManifestUrl, label: 'local fallback snapshot', useMediaBase: false },
   ];
 
-  for (const source of sources) {
+  let manifest = null;
+  let sourceLabel = 'Gallery offline';
+  let useMediaBase = false;
+
+  for (const source of manifestSources) {
     try {
-      const manifest = await fetchJson(source.url);
-      return { manifest, label: source.label };
+      manifest = await fetchJson(source.url);
+      sourceLabel = source.label;
+      useMediaBase = source.useMediaBase;
+      break;
     } catch (error) {
       console.warn(error);
     }
   }
 
-  throw new Error('Could not load either the live media manifest or the local snapshot.');
+  if (!manifest) {
+    throw new Error('Could not load either the live media manifest or the local snapshot.');
+  }
+
+  let historyEras = [];
+  try {
+    historyEras = await fetchJson(GALLERY_CONFIG.historyErasUrl);
+    if (Array.isArray(historyEras?.eras)) {
+      historyEras = historyEras.eras;
+    }
+  } catch (error) {
+    console.warn(error);
+    historyEras = deriveFallbackEras(manifest);
+  }
+
+  return { manifest, historyEras, sourceLabel, useMediaBase };
 }
 
 function renderAlbumCards() {
@@ -136,6 +190,9 @@ function renderAlbumCards() {
   galleryEls.albumList.innerHTML = galleryState.albums.map((album, index) => {
     const isActive = index === galleryState.selectedAlbumIndex;
     const cover = album.cover || placeholderDataUri(album.title, album.year);
+    const eraLine = album.era
+      ? `<span class="album-era">${escapeHtml(album.era.number ? `Era ${album.era.number}` : 'Timeline chapter')} · ${escapeHtml(album.era.title)}</span>`
+      : '';
     return `
       <button class="album-card${isActive ? ' is-active' : ''}" type="button" data-index="${index}">
         <span class="album-card-cover">
@@ -144,6 +201,7 @@ function renderAlbumCards() {
         <span class="album-card-copy">
           <span class="album-card-year">${escapeHtml(album.year || 'unknown-year')}</span>
           <strong>${escapeHtml(album.title)}</strong>
+          ${eraLine}
           <span>${album.photoCount} photo${album.photoCount === 1 ? '' : 's'}</span>
         </span>
       </button>
@@ -169,12 +227,22 @@ function renderActiveAlbum() {
   if (!album) {
     galleryEls.activeAlbumTitle.textContent = 'No album selected';
     galleryEls.activeAlbumMeta.textContent = 'The gallery did not receive any photos.';
+    if (galleryEls.activeAlbumEraDescription) {
+      galleryEls.activeAlbumEraDescription.textContent = '';
+    }
     galleryEls.photoGrid.innerHTML = '';
     return;
   }
 
+  const eraText = album.era
+    ? ` · ${album.era.number ? `Era ${album.era.number}` : 'Timeline chapter'}: ${album.era.title}${album.era.dateRange ? ` (${album.era.dateRange})` : ''}`
+    : '';
+
   galleryEls.activeAlbumTitle.textContent = album.title;
-  galleryEls.activeAlbumMeta.textContent = `${album.year || 'unknown-year'} · ${album.photoCount} photo${album.photoCount === 1 ? '' : 's'}`;
+  galleryEls.activeAlbumMeta.textContent = `${album.year || 'unknown-year'} · ${album.photoCount} photo${album.photoCount === 1 ? '' : 's'}${eraText}`;
+  if (galleryEls.activeAlbumEraDescription) {
+    galleryEls.activeAlbumEraDescription.textContent = album.era?.description || '';
+  }
   galleryEls.photoGrid.innerHTML = album.photos.map((photo, index) => {
     const thumb = photo.thumb || placeholderDataUri(photo.title, album.title);
     const label = photo.title || `Photo ${index + 1}`;
@@ -224,7 +292,12 @@ function openLightbox(index) {
 
   galleryEls.lightboxImage.src = photo.src || placeholderDataUri(photo.title, 'Alex gallery');
   galleryEls.lightboxImage.alt = photo.alt || photo.title || 'Gallery photo';
-  galleryEls.lightboxCaption.textContent = `${photo.title || 'Photo'} · ${galleryState.albums[galleryState.selectedAlbumIndex]?.title || ''}`;
+
+  const album = galleryState.albums[galleryState.selectedAlbumIndex];
+  const era = album?.era
+    ? ` · Era ${album.era.number}: ${album.era.title}`
+    : '';
+  galleryEls.lightboxCaption.textContent = `${photo.title || 'Photo'} · ${album?.title || ''}${era}`;
   galleryEls.lightbox.classList.add('is-open');
   galleryEls.lightbox.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
@@ -258,26 +331,26 @@ function bindLightboxControls() {
   });
 }
 
-function finalizeManifest(manifest, useMediaBase) {
-  const albums = Array.isArray(manifest?.albums) ? manifest.albums.map((album) => normalizeAlbum(album, useMediaBase)) : [];
-  return { ...manifest, albums };
-}
-
 async function initGallery() {
   updateStatus('Loading gallery data…');
   try {
-    const { manifest, label } = await loadManifest();
-    const useMediaBase = label === 'A2 live media store';
-    galleryState.manifest = finalizeManifest(manifest, useMediaBase);
-    galleryState.albums = galleryState.manifest.albums;
+    const { manifest, historyEras, sourceLabel, useMediaBase } = await loadManifestBundle();
+    const eraLookup = buildEraLookup(historyEras);
+
+    galleryState.manifest = manifest;
+    galleryState.historyEras = historyEras;
+    galleryState.albums = Array.isArray(manifest.albums)
+      ? manifest.albums.map((album, index) => normalizeAlbum(album, useMediaBase, eraLookup.get(index + 1)))
+      : [];
     galleryState.selectedAlbumIndex = galleryState.albums.length ? 0 : -1;
     galleryState.currentPhotos = galleryState.selectedAlbumIndex >= 0 ? galleryState.albums[0].photos : [];
-    galleryState.sourceLabel = label;
+    galleryState.lightboxIndex = -1;
 
-    updateSourceLabel(label === 'A2 live media store'
+    const totalPhotos = manifest.photoCount || galleryState.albums.reduce((sum, album) => sum + album.photoCount, 0);
+    updateSourceLabel(sourceLabel === 'A2 live media store'
       ? 'Live gallery connected to A2'
       : 'Using local fallback snapshot while A2 is unavailable');
-    updateStatus(`Loaded ${galleryState.albums.length} album${galleryState.albums.length === 1 ? '' : 's'} and ${galleryState.manifest.photoCount || galleryState.albums.reduce((sum, album) => sum + album.photoCount, 0)} photos.`);
+    updateStatus(`Loaded ${galleryState.albums.length} album${galleryState.albums.length === 1 ? '' : 's'} and ${totalPhotos} photos.`);
     renderAlbumCards();
     renderActiveAlbum();
     bindLightboxControls();
