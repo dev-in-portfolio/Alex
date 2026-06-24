@@ -10,6 +10,7 @@ const partyEls = {
   status: document.getElementById('partyStatus'),
   counter: document.getElementById('partyCounter'),
   viewer: document.getElementById('partyViewer'),
+  backdrop: document.getElementById('partyBackdrop'),
   slideA: document.getElementById('partySlideA'),
   slideB: document.getElementById('partySlideB'),
   next: document.getElementById('partyNext'),
@@ -157,11 +158,17 @@ function renderSparkles() {
 
 function renderSlide(photo, incomingLayer) {
   const img = incomingLayer === 'a' ? partyEls.slideA : partyEls.slideB;
+  const active = partyState.currentPhoto || photo;
 
   img.src = photo.src || '';
   img.alt = photo.title || 'Party photo';
   img.style.objectPosition = photo.objectPosition || 'center center';
   img.classList.add('is-active');
+
+  if (partyEls.backdrop) {
+    partyEls.backdrop.style.backgroundImage = `url("${active.src || photo.src || ''}")`;
+    partyEls.backdrop.style.backgroundPosition = photo.objectPosition || 'center center';
+  }
 
   if (incomingLayer === 'a') {
     partyEls.slideB.classList.remove('is-active');
@@ -177,6 +184,7 @@ async function showNextPhoto() {
   if (!photo) return;
   partyState.currentPhoto = photo;
   partyState.index = (partyState.index + 1) % Math.max(partyState.photos.length, 1);
+  fitCurrentPhoto(photo);
 
   try {
     await preloadImage(photo.src);
@@ -198,6 +206,21 @@ function restartDeck() {
   if (partyEls.slideA) partyEls.slideA.classList.remove('is-active');
   if (partyEls.slideB) partyEls.slideB.classList.remove('is-active');
   showNextPhoto();
+}
+
+function fitCurrentPhoto(photo) {
+  const ratio = (photo?.width && photo?.height) ? photo.width / photo.height : 1;
+  const landscape = ratio >= 1;
+  const slideWidth = landscape ? 'min(96vw, calc(96vh * 1.8))' : 'min(92vw, calc(92vh * 0.78))';
+  const slideHeight = landscape ? 'min(92vh, calc(96vw / 1.8))' : 'min(92vh, 92vw)';
+
+  [partyEls.slideA, partyEls.slideB].forEach((img) => {
+    if (!img) return;
+    img.style.width = 'auto';
+    img.style.height = 'auto';
+    img.style.maxWidth = slideWidth;
+    img.style.maxHeight = slideHeight;
+  });
 }
 
 function startAutoAdvance() {
@@ -288,6 +311,7 @@ async function loadPartyData() {
   renderSparkles();
   updateCounter();
   setActiveButtonState();
+  fitCurrentPhoto(partyState.currentPhoto);
   showNextPhoto();
   startAutoAdvance();
 }
