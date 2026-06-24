@@ -9,10 +9,6 @@ const partyEls = {
   source: document.getElementById('partySource'),
   status: document.getElementById('partyStatus'),
   counter: document.getElementById('partyCounter'),
-  title: document.getElementById('partyTitle'),
-  meta: document.getElementById('partyMeta'),
-  album: document.getElementById('partyAlbum'),
-  description: document.getElementById('partyDescription'),
   viewer: document.getElementById('partyViewer'),
   slideA: document.getElementById('partySlideA'),
   slideB: document.getElementById('partySlideB'),
@@ -161,16 +157,9 @@ function renderSparkles() {
 
 function renderSlide(photo, incomingLayer) {
   const img = incomingLayer === 'a' ? partyEls.slideA : partyEls.slideB;
-  const album = partyState.albums.find((entry) => entry.id === photo.albumId) || null;
-  const albumIndex = album ? partyState.albums.indexOf(album) : -1;
-  const era = albumIndex >= 0 ? partyState.historyEras[albumIndex] : null;
-  const title = photo.title || 'Party photo';
-  const meta = [photo.year || album?.year || 'unknown-year', album?.title || 'Alex archive']
-    .filter(Boolean)
-    .join(' · ');
 
   img.src = photo.src || '';
-  img.alt = title;
+  img.alt = photo.title || 'Party photo';
   img.style.objectPosition = photo.objectPosition || 'center center';
   img.classList.add('is-active');
 
@@ -180,10 +169,6 @@ function renderSlide(photo, incomingLayer) {
     partyEls.slideA.classList.remove('is-active');
   }
 
-  partyEls.title.textContent = title;
-  partyEls.meta.textContent = meta;
-  partyEls.album.textContent = era ? `Era ${era.number}: ${era.title}` : (album?.title || 'Party Mode');
-  partyEls.description.textContent = era?.description || `${album?.photoCount || 0} photo${album?.photoCount === 1 ? '' : 's'} in this album.`;
   updateCounter();
 }
 
@@ -340,8 +325,4 @@ loadPartyData().catch((error) => {
   console.error(error);
   updateSource('Party Mode offline');
   updateStatus('The Party page could not load the A2 manifest.');
-  if (partyEls.title) partyEls.title.textContent = 'Party unavailable';
-  if (partyEls.meta) partyEls.meta.textContent = 'Try again once A2 is published.';
-  if (partyEls.album) partyEls.album.textContent = '';
-  if (partyEls.description) partyEls.description.textContent = 'No photos loaded.';
 });
