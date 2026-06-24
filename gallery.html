@@ -36,59 +36,45 @@
   </nav>
 
   <main>
-    <div class="page-header">
+    <div class="page-header gallery-hero">
       <h1>Gallery</h1>
-      <p>Alex's greatest hits</p>
+      <p>Loading Alex's album vault.</p>
+      <div class="gallery-source" id="gallerySource">Fetching media manifest…</div>
     </div>
 
-    <section class="section" style="padding-top: 2rem;">
-      <div class="gallery-grid">
-        <div class="gallery-item" data-label="The Early Years" data-desc="Where it all began" onclick="openLightbox(0)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">The Early Years</span><span class="desc">Where it all began</span></div>
-        </div>
-        <div class="gallery-item" data-label="Questionable Fashion" data-desc="We all had a phase" onclick="openLightbox(1)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">Questionable Fashion</span><span class="desc">We all had a phase</span></div>
-        </div>
-        <div class="gallery-item" data-label="Adventure Mode" data-desc="Outdoorsy Alex" onclick="openLightbox(2)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">Adventure Mode</span><span class="desc">Outdoorsy Alex</span></div>
-        </div>
-        <div class="gallery-item" data-label="Party Era" data-desc="The wild nights" onclick="openLightbox(3)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">Party Era</span><span class="desc">The wild nights</span></div>
-        </div>
-        <div class="gallery-item" data-label="Candid Classics" data-desc="No filter needed" onclick="openLightbox(4)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">Candid Classics</span><span class="desc">No filter needed</span></div>
-        </div>
-        <div class="gallery-item" data-label="35th Birthday" data-desc="The main event" onclick="openLightbox(5)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">35th Birthday</span><span class="desc">The main event</span></div>
-        </div>
-        <div class="gallery-item" data-label="With Friends" data-desc="The squad" onclick="openLightbox(6)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">With Friends</span><span class="desc">The squad</span></div>
-        </div>
-        <div class="gallery-item" data-label="Being Himself" data-desc="Peak Alex" onclick="openLightbox(7)">
-          <div class="img-placeholder">✦</div>
-          <div class="overlay"><span class="label">Being Himself</span><span class="desc">Peak Alex</span></div>
-        </div>
+    <section class="section gallery-shell">
+      <div class="gallery-status" id="galleryStatus" aria-live="polite">Preparing gallery…</div>
+
+      <div class="gallery-layout">
+        <aside class="gallery-sidebar">
+          <div class="gallery-panel-header">
+            <span class="section-label">Albums</span>
+            <h2>Choose a set</h2>
+          </div>
+          <div class="album-list" id="albumList"></div>
+        </aside>
+
+        <section class="gallery-main" aria-labelledby="activeAlbumTitle">
+          <div class="gallery-panel-header">
+            <span class="section-label">Photos</span>
+            <h2 id="activeAlbumTitle">Waiting for gallery data</h2>
+            <p id="activeAlbumMeta">Select an album to view photos.</p>
+          </div>
+
+          <div class="photo-grid" id="photoGrid"></div>
+        </section>
       </div>
     </section>
-
-    <footer class="footer">
-      Drop your photos in <span class="gold">/img/</span> and update the placeholders
-    </footer>
   </main>
 
-  <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-    <button class="lightbox-nav lightbox-prev" onclick="prevImage()">‹</button>
-    <div class="lightbox-content" id="lightboxContent"></div>
-    <button class="lightbox-nav lightbox-next" onclick="nextImage()">›</button>
-    <div class="lightbox-caption" id="lightboxCaption"></div>
+  <div class="gallery-lightbox" id="galleryLightbox" aria-hidden="true">
+    <button class="gallery-lightbox-close" id="lightboxClose" aria-label="Close photo viewer">×</button>
+    <button class="gallery-lightbox-nav gallery-lightbox-prev" id="lightboxPrev" aria-label="Previous photo">‹</button>
+    <figure class="gallery-lightbox-frame">
+      <img id="lightboxImage" alt="">
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+    <button class="gallery-lightbox-nav gallery-lightbox-next" id="lightboxNext" aria-label="Next photo">›</button>
   </div>
 
   <script src="js/main.js"></script>

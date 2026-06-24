@@ -1,0 +1,105 @@
+{
+  "generatedAt": "2026-06-24T00:00:00Z",
+  "photoCount": 6,
+  "albums": [
+    {
+      "id": "preview-01",
+      "title": "Golden Hour",
+      "year": "Snapshot",
+      "cover": "img/snapshot/preview-01-001-thumb.jpg",
+      "photoCount": 2,
+      "photos": [
+        {
+          "id": "preview-01-001",
+          "title": "First Light",
+          "year": "Snapshot",
+          "src": "img/snapshot/preview-01-001-full.jpg",
+          "thumb": "img/snapshot/preview-01-001-thumb.jpg",
+          "originalName": "preview-01-001.jpg",
+          "width": 1200,
+          "height": 900,
+          "aspectRatio": 1.3333,
+          "sortIndex": 1
+        },
+        {
+          "id": "preview-01-002",
+          "title": "Midnight Toast",
+          "year": "Snapshot",
+          "src": "img/snapshot/preview-01-002-full.jpg",
+          "thumb": "img/snapshot/preview-01-002-thumb.jpg",
+          "originalName": "preview-01-002.jpg",
+          "width": 1200,
+          "height": 900,
+          "aspectRatio": 1.3333,
+          "sortIndex": 2
+        }
+      ]
+    },
+    {
+      "id": "preview-02",
+      "title": "Dance Floor",
+      "year": "Snapshot",
+      "cover": "img/snapshot/preview-02-001-thumb.jpg",
+      "photoCount": 2,
+      "photos": [
+        {
+          "id": "preview-02-001",
+          "title": "Spin It",
+          "year": "Snapshot",
+          "src": "img/snapshot/preview-02-001-full.jpg",
+          "thumb": "img/snapshot/preview-02-001-thumb.jpg",
+          "originalName": "preview-02-001.jpg",
+          "width": 1200,
+          "height": 900,
+          "aspectRatio": 1.3333,
+          "sortIndex": 1
+        },
+        {
+          "id": "preview-02-002",
+          "title": "All In",
+          "year": "Snapshot",
+          "src": "img/snapshot/preview-02-002-full.jpg",
+          "thumb": "img/snapshot/preview-02-002-thumb.jpg",
+          "originalName": "preview-02-002.jpg",
+          "width": 1200,
+          "height": 900,
+          "aspectRatio": 1.3333,
+          "sortIndex": 2
+        }
+      ]
+    },
+    {
+      "id": "preview-03",
+      "title": "Crew Notes",
+      "year": "Snapshot",
+      "cover": "img/snapshot/preview-03-001-thumb.jpg",
+      "photoCount": 2,
+      "photos": [
+        {
+          "id": "preview-03-001",
+          "title": "The Squad",
+          "year": "Snapshot",
+          "src": "img/snapshot/preview-03-001-full.jpg",
+          "thumb": "img/snapshot/preview-03-001-thumb.jpg",
+          "originalName": "preview-03-001.jpg",
+          "width": 1200,
+          "height": 900,
+          "aspectRatio": 1.3333,
+          "sortIndex": 1
+        },
+        {
+          "id": "preview-03-002",
+          "title": "Keepsakes",
+          "year": "Snapshot",
+          "src": "img/snapshot/preview-03-002-full.jpg",
+          "thumb": "img/snapshot/preview-03-002-thumb.jpg",
+          "originalName": "preview-03-002.jpg",
+          "width": 1200,
+          "height": 900,
+          "aspectRatio": 1.3333,
+          "sortIndex": 2
+        }
+      ]
+    }
+  ]
+}
