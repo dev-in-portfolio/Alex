@@ -1814,6 +1814,11 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   backdrop-filter: none;
   box-shadow: none;
   overflow: hidden;
+  --party-media-width: 92vw;
+  --party-media-height: 82vh;
+  --party-backdrop-scale: 1.1;
+  --party-object-position: center center;
+  --party-tilt: 0deg;
 }
 
 .party-backdrop {
@@ -1824,8 +1829,9 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   background-repeat: no-repeat;
   background-size: cover;
   filter: blur(36px) brightness(0.38) saturate(0.85);
-  transform: scale(1.12);
+  transform: scale(var(--party-backdrop-scale));
   opacity: 0.95;
+  transition: filter 0.7s var(--ease-out), transform 0.7s var(--ease-out), opacity 0.7s var(--ease-out);
 }
 
 .party-backdrop::after {
@@ -1840,25 +1846,77 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   left: 50%;
   top: 50%;
   opacity: 0;
-  transition: opacity 0.9s var(--ease-out), transform 6s var(--ease-out);
+  transition: opacity 0.72s var(--ease-out), transform 1.05s var(--ease-out), filter 0.72s var(--ease-out);
   display: block;
-  width: auto;
-  height: auto;
-  max-width: calc(100vw - 2rem);
-  max-height: calc(100vh - 2rem);
-  transform: translate(-50%, -50%) scale(0.98);
+  width: var(--party-media-width);
+  height: var(--party-media-height);
+  max-width: var(--party-media-width);
+  max-height: var(--party-media-height);
+  transform: translate(-50%, -50%) scale(0.94) rotate(calc(var(--party-tilt) * -0.5));
   transform-origin: center center;
   object-fit: contain;
-  object-position: center center;
+  object-position: var(--party-object-position);
   box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.08);
   z-index: 2;
+  filter: saturate(0.98) contrast(0.98) brightness(0.96);
+  will-change: transform, opacity, filter;
 }
 
 .party-slide.is-active {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1.01);
+  transform: translate(-50%, -50%) scale(1.03) rotate(var(--party-tilt));
+  filter: saturate(1.05) contrast(1.04) brightness(1);
+}
+
+.party-slide.is-entering {
+  animation: partyEnter 0.92s var(--ease-out) both;
+}
+
+.party-slide.is-leaving {
+  animation: partyLeave 0.78s var(--ease-out) both;
+}
+
+.party-viewer.is-transitioning .party-slide.is-active {
+  filter: saturate(1.18) contrast(1.1) brightness(1.05);
+  box-shadow: 0 34px 120px rgba(0, 0, 0, 0.62), 0 0 42px rgba(212, 175, 55, 0.18);
+}
+
+.party-viewer.is-transitioning .party-backdrop {
+  filter: blur(52px) brightness(0.28) saturate(1.05);
+  opacity: 1;
+}
+
+@keyframes partyEnter {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08) rotate(calc(var(--party-tilt) + 1.5deg));
+    filter: blur(6px) saturate(1.1) brightness(1.08);
+  }
+  55% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.02) rotate(var(--party-tilt));
+    filter: blur(0) saturate(1.08) brightness(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.03) rotate(var(--party-tilt));
+    filter: saturate(1.05) contrast(1.04) brightness(1);
+  }
+}
+
+@keyframes partyLeave {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.03) rotate(var(--party-tilt));
+    filter: saturate(1.05) contrast(1.04) brightness(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9) rotate(calc(var(--party-tilt) * -0.8));
+    filter: blur(8px) saturate(0.9) brightness(0.92);
+  }
 }
 
 .party-overlay {
@@ -1871,7 +1929,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   background:
     linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.08) 35%, rgba(0,0,0,0.0) 100%),
     linear-gradient(to bottom, rgba(0,0,0,0.34) 0%, rgba(0,0,0,0.0) 26%);
-  pointer-events: none;
+  pointer-events: auto;
   z-index: 3;
 }
 
@@ -1882,7 +1940,28 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   gap: 1rem;
   align-items: flex-start;
   flex-wrap: wrap;
-  pointer-events: none;
+  pointer-events: auto;
+}
+
+.party-progress {
+  width: 100%;
+  height: 3px;
+  margin-top: auto;
+  margin-bottom: 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.party-progress span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.55);
+  transition: width 0.6s var(--ease-out);
 }
 
 .party-controls {
@@ -1891,8 +1970,118 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-top: 0.5rem;
+  margin-top: 0;
   pointer-events: auto;
+  padding: 0.9rem 1rem;
+  border-radius: 22px;
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  background: rgba(3, 3, 3, 0.66);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+}
+
+.party-cursor-dot,
+.party-cursor-ring {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 99997;
+  transform: translate(-50%, -50%);
+}
+
+.party-cursor-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  mix-blend-mode: screen;
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.6);
+}
+
+.party-cursor-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 55, 0.38);
+  background: rgba(212, 175, 55, 0.05);
+  mix-blend-mode: screen;
+  transition: width 0.22s var(--ease-out), height 0.22s var(--ease-out), border-color 0.22s var(--ease-out), background 0.22s var(--ease-out);
+}
+
+.party-fullscreen .party-cursor-dot,
+.party-fullscreen .party-cursor-ring {
+  display: block;
+}
+
+.party-fullscreen .cursor-dot,
+.party-fullscreen .cursor-ring {
+  display: none;
+}
+
+.party-exit {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 5;
+  pointer-events: auto;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: rgba(3, 3, 3, 0.72);
+  color: var(--gold-light);
+  border-radius: 999px;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out), border-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.32);
+}
+
+.party-fullscreen .party-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.party-exit:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.party-fullscreen .party-stage {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.16), transparent 24%),
+    radial-gradient(circle at 80% 10%, rgba(245, 230, 163, 0.1), transparent 14%),
+    #000;
+}
+
+.party-fullscreen .party-controls {
+  padding-right: 5rem;
+}
+
+.party-pulse .party-backdrop {
+  animation: partyPulseBackdrop 6s ease-in-out infinite;
+}
+
+.party-pulse .party-slide.is-active {
+  animation: partyPulseFrame 5s ease-in-out infinite;
+}
+
+.party-pulse .party-fx span {
+  animation-duration: 7s;
+}
+
+@keyframes partyPulseBackdrop {
+  0%, 100% { filter: blur(38px) brightness(0.36) saturate(0.86); }
+  50% { filter: blur(48px) brightness(0.45) saturate(1.08); }
+}
+
+@keyframes partyPulseFrame {
+  0%, 100% { box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45), 0 0 0 rgba(212, 175, 55, 0.0); }
+  50% { box-shadow: 0 26px 110px rgba(0, 0, 0, 0.52), 0 0 38px rgba(212, 175, 55, 0.16); }
 }
 
 .party-button {
@@ -1900,7 +2089,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   background: rgba(3, 3, 3, 0.72);
   color: var(--text);
   border-radius: 999px;
-  padding: 0.85rem 1.15rem;
+  padding: 0.8rem 1.15rem;
   font-size: 0.8rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1934,6 +2123,7 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-muted);
+  min-width: 0;
 }
 
 .party-status strong {
@@ -1983,18 +2173,26 @@ h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; lette
   }
 
   .party-slide {
-    max-width: calc(100vw - 1rem);
-    max-height: calc(100vh - 1rem);
+    max-width: calc(100vw - 0.75rem);
+    max-height: calc(100vh - 0.75rem);
     border-radius: 12px;
   }
 
   .party-controls {
     justify-content: stretch;
     align-items: flex-end;
+    gap: 0.6rem;
+    padding: 0.8rem 0.85rem;
+  }
+
+  .party-exit {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.55rem 0.8rem;
   }
 
   .party-button {
-    flex: 1 1 140px;
+    flex: 1 1 120px;
   }
 
   .party-status {

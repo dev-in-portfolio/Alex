@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Party Mode — Alex 35</title>
+  <title>Party Mode - Alex 35</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -33,15 +33,23 @@
   <main class="party-shell">
     <section class="party-stage" aria-label="Party slideshow">
       <div class="party-fx" id="partyFx"></div>
+      <div class="party-cursor-dot" id="partyCursorDot"></div>
+      <div class="party-cursor-ring" id="partyCursorRing"></div>
       <div class="party-frame">
         <section class="party-viewer" id="partyViewer">
           <div class="party-backdrop" id="partyBackdrop" aria-hidden="true"></div>
           <img class="party-slide is-active" id="partySlideA" alt="">
           <img class="party-slide" id="partySlideB" alt="">
           <div class="party-overlay">
+            <button class="party-exit" type="button" id="partyFullscreenExit" aria-label="Exit fullscreen">
+              Exit Fullscreen
+            </button>
             <div class="party-topline">
-              <div class="party-meta" id="partySource">Loading the A2 photo vault…</div>
-              <div class="party-badge" id="partyStatus">Preparing the deck…</div>
+              <div class="party-meta" id="partySource">Loading the A2 photo vault...</div>
+              <div class="party-badge" id="partyStatus">Preparing the deck...</div>
+            </div>
+            <div class="party-progress" aria-hidden="true">
+              <span id="partyProgress"></span>
             </div>
             <div class="party-controls">
               <div class="party-status">
@@ -50,6 +58,8 @@
               </div>
               <button class="party-button primary" type="button" id="partyNext">Next Photo</button>
               <button class="party-button" type="button" id="partyPause">Pause</button>
+              <button class="party-button" type="button" id="partyFullscreen">Fullscreen</button>
+              <button class="party-button" type="button" id="partyPulse">Pulse On</button>
               <a class="party-button" href="index.html" id="partyBack">Back to Site</a>
             </div>
           </div>

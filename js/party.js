@@ -3,20 +3,29 @@ const PARTY_CONFIG = {
   manifestUrl: 'https://happy-alex-2.netlify.app/data/manifest.json',
   historyErasUrl: 'https://happy-alex-2.netlify.app/data/history-eras.json',
   fallbackManifestUrl: 'data/manifest.snapshot.json',
+  ambientPulseEnabled: true,
+  ambientPulseKey: 'alex-party-ambient-pulse',
 };
 
 const partyEls = {
   source: document.getElementById('partySource'),
   status: document.getElementById('partyStatus'),
+  caption: document.getElementById('partyCaption'),
   counter: document.getElementById('partyCounter'),
+  progress: document.getElementById('partyProgress'),
   viewer: document.getElementById('partyViewer'),
   backdrop: document.getElementById('partyBackdrop'),
   slideA: document.getElementById('partySlideA'),
   slideB: document.getElementById('partySlideB'),
   next: document.getElementById('partyNext'),
   pause: document.getElementById('partyPause'),
+  fullscreen: document.getElementById('partyFullscreen'),
+  fullscreenExit: document.getElementById('partyFullscreenExit'),
+  pulse: document.getElementById('partyPulse'),
   back: document.getElementById('partyBack'),
   fx: document.getElementById('partyFx'),
+  cursorDot: document.getElementById('partyCursorDot'),
+  cursorRing: document.getElementById('partyCursorRing'),
 };
 
 const partyState = {
@@ -29,19 +38,15 @@ const partyState = {
   index: -1,
   paused: false,
   timer: null,
-  sourceLabel: 'Loading…',
+  sourceLabel: 'Loading...',
+  fullscreen: false,
+  pulseEnabled: false,
+  transitionTimer: null,
+  cursorX: 0,
+  cursorY: 0,
 };
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function escapeHtml(text = '') {
-  return String(text)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
 
 function isAbsoluteUrl(value = '') {
   return /^(https?:|data:|blob:)/i.test(value);
@@ -101,6 +106,19 @@ function updateSource(message) {
   if (partyEls.source) partyEls.source.textContent = message;
 }
 
+function updateCaption(photo) {
+  if (!partyEls.caption) return;
+  if (!photo) {
+    partyEls.caption.textContent = 'Waiting for the first frame.';
+    return;
+  }
+
+  const albumPart = photo.albumTitle ? `${photo.albumTitle}` : 'Party photo';
+  const yearPart = photo.year ? ` | ${photo.year}` : '';
+  const indexPart = typeof photo.photoIndex === 'number' ? ` | Shot ${String(photo.photoIndex + 1).padStart(2, '0')}` : '';
+  partyEls.caption.textContent = `${albumPart}${yearPart}${indexPart}`;
+}
+
 function updateCounter() {
   if (!partyEls.counter) return;
   const total = partyState.photos.length;
@@ -108,15 +126,32 @@ function updateCounter() {
   partyEls.counter.textContent = `${current.toString().padStart(3, '0')} / ${total.toString().padStart(3, '0')}`;
 }
 
+function updateProgress() {
+  if (!partyEls.progress) return;
+  const total = Math.max(partyState.photos.length, 1);
+  const current = partyState.index >= 0 ? partyState.index + 1 : 0;
+  const percent = Math.max(0, Math.min(100, (current / total) * 100));
+  partyEls.progress.style.width = `${percent}%`;
+}
+
 function setActiveButtonState() {
   if (partyEls.pause) {
     partyEls.pause.textContent = partyState.paused ? 'Play' : 'Pause';
   }
+  if (partyEls.fullscreen) {
+    partyEls.fullscreen.textContent = partyState.fullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+  }
+  if (partyEls.fullscreenExit) {
+    partyEls.fullscreenExit.hidden = !partyState.fullscreen;
+  }
+  if (partyEls.pulse) {
+    partyEls.pulse.textContent = partyState.pulseEnabled ? 'Pulse Off' : 'Pulse On';
+  }
 }
 
-function buildDeck(startIndex = -1) {
+function buildDeck() {
   const shuffled = shuffle(partyState.photos);
-  if (startIndex >= 0 && shuffled.length > 1 && shuffled[0]?.src === partyState.currentPhoto?.src) {
+  if (shuffled.length > 1 && shuffled[0]?.src === partyState.currentPhoto?.src) {
     shuffled.push(shuffled.shift());
   }
   partyState.deck = shuffled;
@@ -126,27 +161,72 @@ function nextFromDeck() {
   if (!partyState.deck.length) {
     buildDeck();
   }
+
   const next = partyState.deck.shift();
   if (!next) return null;
+
   if (partyState.currentPhoto && next.src === partyState.currentPhoto.src && partyState.deck.length) {
     return nextFromDeck();
   }
+
   return next;
 }
 
 function preloadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    img.decoding = 'async';
     img.onload = () => resolve(img);
     img.onerror = reject;
     img.src = src;
   });
 }
 
+function fitCurrentPhoto(photo) {
+  if (!partyEls.viewer || !photo) return;
+
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1280;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 720;
+  const ratio = (photo?.width && photo?.height) ? photo.width / photo.height : 1;
+  const horizontalReserve = viewportWidth < 768 ? 24 : 64;
+  const verticalReserve = viewportWidth < 768 ? 132 : 176;
+  const maxWidth = Math.max(280, viewportWidth - horizontalReserve);
+  const maxHeight = Math.max(320, viewportHeight - verticalReserve);
+
+  let fittedWidth = maxWidth;
+  let fittedHeight = fittedWidth / ratio;
+
+  if (fittedHeight > maxHeight) {
+    fittedHeight = maxHeight;
+    fittedWidth = fittedHeight * ratio;
+  }
+
+  const backdropScale = ratio >= 1.4 ? 1.12 : ratio <= 0.85 ? 1.08 : 1.1;
+  const objectPosition = photo.objectPosition || 'center center';
+  const tilt = ((photo.photoIndex || 0) % 5 - 2) * 0.7;
+
+  if (partyEls.viewer) {
+    partyEls.viewer.style.setProperty('--party-media-width', `${Math.round(fittedWidth)}px`);
+    partyEls.viewer.style.setProperty('--party-media-height', `${Math.round(fittedHeight)}px`);
+    partyEls.viewer.style.setProperty('--party-backdrop-scale', `${backdropScale}`);
+    partyEls.viewer.style.setProperty('--party-object-position', objectPosition);
+    partyEls.viewer.style.setProperty('--party-tilt', `${tilt}deg`);
+  }
+
+  [partyEls.slideA, partyEls.slideB].forEach((img) => {
+    if (!img) return;
+    img.style.width = `${Math.round(fittedWidth)}px`;
+    img.style.height = `${Math.round(fittedHeight)}px`;
+    img.style.maxWidth = `${Math.round(fittedWidth)}px`;
+    img.style.maxHeight = `${Math.round(fittedHeight)}px`;
+    img.style.objectPosition = objectPosition;
+  });
+}
+
 function renderSparkles() {
   if (!partyEls.fx) return;
   const count = prefersReducedMotion ? 10 : 24;
-  partyEls.fx.innerHTML = Array.from({ length: count }, (_, index) => {
+  partyEls.fx.innerHTML = Array.from({ length: count }, () => {
     const left = Math.random() * 100;
     const top = Math.random() * 100;
     const size = 6 + Math.random() * 12;
@@ -156,14 +236,78 @@ function renderSparkles() {
   }).join('');
 }
 
+function updatePartyCursor(x, y) {
+  if (!partyState.fullscreen) return;
+  if (partyEls.cursorDot) {
+    partyEls.cursorDot.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+  }
+  if (partyEls.cursorRing) {
+    partyEls.cursorRing.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+  }
+}
+
+function syncFullscreenState() {
+  partyState.fullscreen = Boolean(document.fullscreenElement);
+  document.body.classList.toggle('party-fullscreen', partyState.fullscreen);
+  document.body.classList.toggle('party-local-cursor', partyState.fullscreen);
+  setActiveButtonState();
+}
+
+async function toggleFullscreen() {
+  if (!partyEls.viewer) return;
+  if (document.fullscreenElement) {
+    await document.exitFullscreen();
+    return;
+  }
+  await partyEls.viewer.requestFullscreen?.();
+}
+
+function syncPulseState(forceValue) {
+  let stored = null;
+  try {
+    stored = window.localStorage.getItem(PARTY_CONFIG.ambientPulseKey);
+  } catch (error) {
+    console.warn(error);
+  }
+  const enabled = typeof forceValue === 'boolean'
+    ? forceValue
+    : stored === null
+      ? PARTY_CONFIG.ambientPulseEnabled
+      : stored === 'true';
+
+  partyState.pulseEnabled = enabled;
+  document.body.classList.toggle('party-pulse', enabled);
+  try {
+    window.localStorage.setItem(PARTY_CONFIG.ambientPulseKey, String(enabled));
+  } catch (error) {
+    console.warn(error);
+  }
+  setActiveButtonState();
+}
+
+function togglePulse() {
+  syncPulseState(!partyState.pulseEnabled);
+}
+
 function renderSlide(photo, incomingLayer) {
   const img = incomingLayer === 'a' ? partyEls.slideA : partyEls.slideB;
   const active = partyState.currentPhoto || photo;
+  const outgoing = incomingLayer === 'a' ? partyEls.slideB : partyEls.slideA;
+
+  if (!img) return;
+
+  if (partyState.transitionTimer) {
+    clearTimeout(partyState.transitionTimer);
+    partyState.transitionTimer = null;
+  }
+
+  outgoing?.classList.remove('is-entering');
+  outgoing?.classList.add('is-leaving');
 
   img.src = photo.src || '';
   img.alt = photo.title || 'Party photo';
   img.style.objectPosition = photo.objectPosition || 'center center';
-  img.classList.add('is-active');
+  img.classList.add('is-active', 'is-entering');
 
   if (partyEls.backdrop) {
     partyEls.backdrop.style.backgroundImage = `url("${active.src || photo.src || ''}")`;
@@ -171,17 +315,29 @@ function renderSlide(photo, incomingLayer) {
   }
 
   if (incomingLayer === 'a') {
-    partyEls.slideB.classList.remove('is-active');
+    partyEls.slideB?.classList.remove('is-active');
   } else {
-    partyEls.slideA.classList.remove('is-active');
+    partyEls.slideA?.classList.remove('is-active');
   }
 
+  partyEls.viewer?.classList.remove('is-transitioning');
+  void partyEls.viewer?.offsetWidth;
+  partyEls.viewer?.classList.add('is-transitioning');
+  partyState.transitionTimer = window.setTimeout(() => {
+    partyEls.viewer?.classList.remove('is-transitioning');
+    img.classList.remove('is-entering');
+    outgoing?.classList.remove('is-leaving');
+    partyState.transitionTimer = null;
+  }, prefersReducedMotion ? 220 : 700);
+
   updateCounter();
+  updateProgress();
 }
 
 async function showNextPhoto() {
   const photo = nextFromDeck();
   if (!photo) return;
+
   partyState.currentPhoto = photo;
   partyState.index = (partyState.index + 1) % Math.max(partyState.photos.length, 1);
   fitCurrentPhoto(photo);
@@ -195,7 +351,8 @@ async function showNextPhoto() {
   const layer = partyState.activeLayer === 'a' ? 'b' : 'a';
   renderSlide(photo, layer);
   partyState.activeLayer = layer;
-  updateStatus(`${partyState.sourceLabel} · ${partyState.paused ? 'paused' : 'playing'} · ${partyState.deck.length} queued`);
+  updateCaption(photo);
+  updateStatus(`${partyState.sourceLabel} | ${partyState.paused ? 'paused' : 'playing'} | ${partyState.deck.length} queued`);
 }
 
 function restartDeck() {
@@ -203,29 +360,17 @@ function restartDeck() {
   partyState.index = -1;
   partyState.currentPhoto = null;
   partyState.activeLayer = 'a';
-  if (partyEls.slideA) partyEls.slideA.classList.remove('is-active');
-  if (partyEls.slideB) partyEls.slideB.classList.remove('is-active');
+  partyEls.slideA?.classList.remove('is-active');
+  partyEls.slideB?.classList.remove('is-active');
+  updateCaption(null);
+  updateCounter();
+  updateProgress();
   showNextPhoto();
-}
-
-function fitCurrentPhoto(photo) {
-  const ratio = (photo?.width && photo?.height) ? photo.width / photo.height : 1;
-  const landscape = ratio >= 1;
-  const slideWidth = landscape ? 'min(96vw, calc(96vh * 1.8))' : 'min(92vw, calc(92vh * 0.78))';
-  const slideHeight = landscape ? 'min(92vh, calc(96vw / 1.8))' : 'min(92vh, 92vw)';
-
-  [partyEls.slideA, partyEls.slideB].forEach((img) => {
-    if (!img) return;
-    img.style.width = 'auto';
-    img.style.height = 'auto';
-    img.style.maxWidth = slideWidth;
-    img.style.maxHeight = slideHeight;
-  });
 }
 
 function startAutoAdvance() {
   stopAutoAdvance();
-  const interval = prefersReducedMotion ? 10000 : 6200;
+  const interval = prefersReducedMotion ? 12000 : 6800;
   partyState.timer = window.setInterval(() => {
     if (!partyState.paused) {
       showNextPhoto();
@@ -243,7 +388,7 @@ function stopAutoAdvance() {
 function togglePause(forceState) {
   partyState.paused = typeof forceState === 'boolean' ? forceState : !partyState.paused;
   setActiveButtonState();
-  updateStatus(`${partyState.sourceLabel} · ${partyState.paused ? 'paused' : 'playing'} · ${partyState.deck.length} queued`);
+  updateStatus(`${partyState.sourceLabel} | ${partyState.paused ? 'paused' : 'playing'} | ${partyState.deck.length} queued`);
 }
 
 async function loadPartyData() {
@@ -304,14 +449,16 @@ async function loadPartyData() {
   partyState.sourceLabel = source.label;
 
   const totalPhotos = partyState.photos.length;
-  updateSource(`${source.label} · ${partyState.albums.length} albums · ${totalPhotos} photos`);
+  updateSource(`${source.label} | ${partyState.albums.length} albums | ${totalPhotos} photos`);
   updateStatus(`Ready to party with ${totalPhotos} photos.`);
 
   buildDeck();
   renderSparkles();
+  updateCaption(null);
   updateCounter();
+  updateProgress();
+  syncPulseState();
   setActiveButtonState();
-  fitCurrentPhoto(partyState.currentPhoto);
   showNextPhoto();
   startAutoAdvance();
 }
@@ -325,6 +472,23 @@ function bindControls() {
 
   partyEls.pause?.addEventListener('click', () => {
     togglePause();
+  });
+
+  partyEls.fullscreen?.addEventListener('click', () => {
+    toggleFullscreen().catch((error) => {
+      console.warn(error);
+    });
+  });
+
+  partyEls.fullscreenExit?.addEventListener('click', () => {
+    if (!document.fullscreenElement) return;
+    document.exitFullscreen().catch((error) => {
+      console.warn(error);
+    });
+  });
+
+  partyEls.pulse?.addEventListener('click', () => {
+    togglePulse();
   });
 
   document.addEventListener('keydown', (event) => {
@@ -341,7 +505,43 @@ function bindControls() {
       event.preventDefault();
       restartDeck();
     }
+    if (event.key.toLowerCase() === 'f') {
+      event.preventDefault();
+      toggleFullscreen().catch((error) => {
+        console.warn(error);
+      });
+    }
+    if (event.key.toLowerCase() === 'p') {
+      event.preventDefault();
+      togglePulse();
+    }
   });
+
+  window.addEventListener('resize', () => {
+    fitCurrentPhoto(partyState.currentPhoto);
+  });
+
+  document.addEventListener('mousemove', (event) => {
+    partyState.cursorX = event.clientX;
+    partyState.cursorY = event.clientY;
+    updatePartyCursor(event.clientX, event.clientY);
+  });
+
+  document.addEventListener('pointermove', (event) => {
+    partyState.cursorX = event.clientX;
+    partyState.cursorY = event.clientY;
+    updatePartyCursor(event.clientX, event.clientY);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      togglePause(true);
+    }
+  });
+
+  document.addEventListener('fullscreenchange', syncFullscreenState);
+  syncFullscreenState();
+  updatePartyCursor(window.innerWidth * 0.5, window.innerHeight * 0.5);
 }
 
 bindControls();
